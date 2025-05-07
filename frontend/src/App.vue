@@ -1,33 +1,35 @@
 <template>
   <v-app>
     <!-- Header -->
-    <v-app-bar app color="light-blue lighten-2" flat height="100">
+    <v-app-bar app color="blue-darken-4" flat height="100">
       <v-container class="d-flex align-center">
-        <!-- ✅ Hình chữ nhật thay avatar tròn -->
-        <img src="/logo.png" alt="Logo TOAMUSEN" style="height: 80px; width: auto; margin-right: 16px;" />
-        <span class="text-h5 font-weight-bold">TOAMUSEN</span>
+        <!-- ✅ Logo hình tròn với hiệu ứng shadow -->
+        <v-avatar size="80" class="me-4 elevation-8">
+          <img src="/logo.png" alt="Logo TOAMUSEN" />
+        </v-avatar>
+        <span class="text-h4 font-weight-bold white--text">TOAMUSEN</span>
+        <v-spacer></v-spacer>
       </v-container>
     </v-app-bar>
 
     <!-- Sidebar -->
-    <v-navigation-drawer
-      app
-      color="light-blue lighten-4"
-      width="220"
-      class="pa-3"
-    >
+    <v-navigation-drawer app color="#223a70" width="240" permanent class="sidebar">
       <v-list dense>
-        <v-list-item
-          v-for="item in menuItems"
-          :key="item"
-          @click="selectedPage = item"
-          :class="{ 'bg-blue lighten-2 white--text': selectedPage === item }"
-          rounded
-        >
-          <v-list-item-title class="text-subtitle-1 font-weight-medium">
-            {{ item }}
-          </v-list-item-title>
-        </v-list-item>
+        <v-list-item-group v-model="selectedPage">
+          <v-list-item
+            v-for="item in menuItems"
+            :key="item.name"
+            :value="item.name"
+            class="sidebar-item"
+            rounded
+            @click="selectedPage = item.name"
+          >
+            <div class="sidebar-item-inner">
+              <v-icon size="28" class="sidebar-icon">{{ item.icon }}</v-icon>
+              <span class="sidebar-title">{{ item.name }}</span>
+            </div>
+          </v-list-item>
+        </v-list-item-group>
       </v-list>
     </v-navigation-drawer>
 
@@ -50,11 +52,10 @@
       </v-container>
     </v-main>
 
-    <!-- ✅ Footer với thời gian realtime -->
-    <v-footer app color="light-blue lighten-3" padless>
-      <v-col class="text-center text-body-2 py-3">
-        {{ currentTime }}
-        <br />
+    <!-- Footer -->
+    <v-footer app color="blue-darken-3" padless>
+      <v-col class="text-center text-body-2 py-3 white--text">
+        {{ currentTime }}<br />
         © 2025 Dự án Cảm Biến Mockup – All rights reserved
       </v-col>
     </v-footer>
@@ -67,8 +68,15 @@ import SensorCard from './components/SensorCard.vue'
 import SensorDetail from './components/SensorDetail.vue'
 import axios from 'axios'
 
-// Menu bên trái
-const menuItems = ['Tổng Quan', 'Temperature', 'CO₂', 'Touch Sensor', 'Button Sensor', 'Current Sensor']
+// Menu bên trái với biểu tượng (Sửa icon Touch Sensor)
+const menuItems = [
+  { name: 'Tổng Quan', icon: 'mdi-view-dashboard' },
+  { name: 'Temperature', icon: 'mdi-thermometer' },
+  { name: 'CO₂', icon: 'mdi-molecule-co2' },
+  { name: 'Touch Sensor', icon: 'mdi-hand-back-left-outline' },
+  { name: 'Button Sensor', icon: 'mdi-radiobox-marked' },
+  { name: 'Current Sensor', icon: 'mdi-flash' }
+]
 const selectedPage = ref('Tổng Quan')
 
 // Mock dữ liệu cảm biến
@@ -140,12 +148,30 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.v-list-item {
-  transition: 0.3s;
-  cursor: pointer;
+.sidebar {
+  background-color: #223a70 !important;
 }
-.v-list-item:hover {
-  background-color: #90caf9 !important;
-  color: white;
+.sidebar-item {
+  padding: 12px 16px;
+  transition: all 0.3s ease-in-out;
+}
+.sidebar-item-inner {
+  display: flex;
+  align-items: center;
+}
+.sidebar-icon {
+  margin-right: 16px;
+  color: #ffffff;
+}
+.sidebar-title {
+  font-weight: 500;
+  color: #ffffff;
+}
+.sidebar-item:hover {
+  background-color: #1e88e5 !important;
+  transform: scale(1.02);
+}
+.text-h4 {
+  font-size: 2.25rem;
 }
 </style>

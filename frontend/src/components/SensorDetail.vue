@@ -2,7 +2,7 @@
   <v-row>
     <!-- Card nhỏ thông tin -->
     <v-col cols="12" md="4">
-      <v-card class="pa-4" outlined>
+      <v-card class="info-card pa-4" outlined>
         <v-card-title class="text-h6">{{ sensorName }}</v-card-title>
         <v-card-text>
           <v-select
@@ -16,12 +16,12 @@
             label="Khoảng thời gian"
             variant="outlined"
             density="compact"
-            class="mb-3"
+            class="mb-3 time-select"
           />
-          <div class="text-subtitle-1">
+          <div class="text-subtitle-1 value-info">
             <strong>Thời gian:</strong> {{ currentTime }}
           </div>
-          <div class="text-subtitle-1">
+          <div class="text-subtitle-1 value-info">
             <strong>Giá trị:</strong> {{ latestValue }} {{ latestUnit }}
           </div>
         </v-card-text>
@@ -30,7 +30,7 @@
 
     <!-- Biểu đồ -->
     <v-col cols="12" md="8">
-      <v-card class="pa-4" outlined height="500px">
+      <v-card class="chart-card pa-4" outlined>
         <Bar v-if="isBarChart" :data="chartData" :options="chartOptions" />
         <Line v-else-if="chartDataReady" :data="chartData" :options="chartOptions" />
       </v-card>
@@ -77,7 +77,7 @@ async function fetchSensorData() {
     const sensorList = response.data
 
     let keyword = props.sensorName.toLowerCase()
-    if (keyword.includes('co2') || keyword.includes('co2')) keyword = 'co2'
+    if (keyword.includes('co2')) keyword = 'co2'
     else if (keyword.includes('touch')) keyword = 'touch'
     else if (keyword.includes('button')) keyword = 'button'
     else if (keyword.includes('current')) keyword = 'current'
@@ -122,15 +122,9 @@ async function fetchSensorData() {
             if (keyword === 'button') return parseInt(sensor.value.match(/\d+/)?.[0] || '0')
             return parseFloat(sensor.value) || 0
           }),
-          backgroundColor: keyword === 'button'
-            ? sliced.map(sensor => {
-                const combo = parseInt(sensor.value.match(/\d+/)?.[0] || '0')
-                const colors = ['#e6194b', '#3cb44b', '#ffe119', '#0082c8', '#f58231', '#911eb4', '#46f0f0', '#f032e6']
-                return colors[combo - 1] || '#999'
-              })
-            : 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(0,0,0,0.2)',
-          borderWidth: 1,
+          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 2,
           fill: keyword !== 'button',
           tension: 0.4
         }
@@ -143,35 +137,26 @@ async function fetchSensorData() {
       scales: {
         x: {
           ticks: {
-            maxTicksLimit: 10
+            maxTicksLimit: 10,
+            color: '#666'
           }
         },
-        y: keyword === 'co2'
-          ? {
-              min: 400,
-              max: 2000,
-              title: { display: true, text: 'ppm' }
-            }
-          : keyword === 'button'
-          ? {
-              min: 0,
-              max: 8,
-              ticks: { stepSize: 1 },
-              title: { display: true, text: 'Combo #' }
-            }
-          : keyword === 'touch'
-          ? {
-              min: 0,
-              max: 1,
-              ticks: {
-                stepSize: 1,
-                callback: v => (v === 1 ? 'Chạm' : 'Không')
-              },
-              title: { display: true, text: 'Trạng thái' }
-            }
-          : {
-              beginAtZero: true
-            }
+        y: {
+          beginAtZero: true,
+          title: { display: true, text: props.sensorName, color: '#444', font: { size: 16, weight: 'bold' } }
+        }
+      },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: '#444', font: { size: 14 } }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleFont: { size: 14 },
+          bodyFont: { size: 12 },
+          padding: 10
+        }
       }
     }
 
@@ -199,7 +184,23 @@ watch(() => props.sensorName, () => {
 </script>
 
 <style scoped>
-.v-card {
-  min-height: 150px;
+.info-card {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.time-select {
+  margin-bottom: 12px;
+}
+.value-info {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+.chart-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 </style>
